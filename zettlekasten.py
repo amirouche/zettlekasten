@@ -31,10 +31,6 @@ def add():
         fd, filepath = mkstemp()
         os.close(fd)
 
-        #
-        # args = shlex.split(command)
-        # run(args, shell=True)
-
         editor = os.environ.get('EDITOR', 'vi')
         os.system('{} "{}"'.format(editor, filepath))
 

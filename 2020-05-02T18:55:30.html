@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>hyper.dev</title>
+    </head>
+    <body>
+        
+    <h1><a href="https://hyper.dev">hyper.dev</a></h1>
+    <div>
+        <p>The new and improved <code>ff.scm</code> would look like:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">create-app</span> <span class="nv">container</span> <span class="nv">init</span> <span class="nv">view</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">let </span><span class="p">((</span><span class="nf">state</span> <span class="p">(</span><span class="nf">init</span><span class="p">)))</span>  <span class="c1">;; init state</span>
+    <span class="p">(</span><span class="k">letrec </span><span class="p">((</span><span class="nf">make-controller</span>
+              <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">action</span><span class="p">)</span>
+                <span class="c1">;; passed to view, used to wrap DOM event callback.</span>
+                <span class="p">(</span><span class="k">lambda </span><span class="nv">args</span>
+                  <span class="p">(</span><span class="k">let </span><span class="p">((</span><span class="nf">new</span> <span class="p">(</span><span class="nb">apply </span><span class="p">(</span><span class="nf">action</span> <span class="nv">state</span> <span class="nv">args</span><span class="p">))))</span>
+                    <span class="p">(</span><span class="k">set! </span><span class="nv">state</span> <span class="nv">new</span><span class="p">)</span>
+                    <span class="p">(</span><span class="nf">render!</span><span class="p">)))))</span>
+             <span class="p">(</span><span class="nf">render!</span>
+              <span class="p">(</span><span class="k">lambda </span><span class="p">()</span>
+                <span class="p">(</span><span class="k">set! </span><span class="nv">container</span> <span class="p">(</span><span class="nf">diff+patch!</span> <span class="nv">container</span> <span class="p">(</span><span class="nf">view</span> <span class="nv">state</span> <span class="nv">make-controller</span><span class="p">)))))))</span>
+      <span class="p">(</span><span class="nf">render!</span><span class="p">)))</span>
+</pre></div>
+<p>That is only part of the story, because <code>action</code> can be paused to
+execute something asynchronous.  Take a look at an improved
+<code>createApp</code> written in JavaScript for the browser:</p>
+<div class="highlight"><pre><span></span><span class="kd">let</span> <span class="nx">createSimpleApp</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">app</span><span class="p">,</span> <span class="nx">root</span><span class="p">,</span> <span class="nx">init</span><span class="p">,</span> <span class="nx">view</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">model</span> <span class="o">=</span> <span class="nx">init</span><span class="p">();</span>
+    <span class="kd">let</span> <span class="nx">render</span><span class="p">;</span>
+
+    <span class="kd">let</span> <span class="nx">makeController</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">controller</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// XXX: This might be performance bottleneck</span>
+            <span class="c1">// https://fb.me/react-event-pooling</span>
+            <span class="nx">event</span><span class="p">.</span><span class="nx">persist</span><span class="p">()</span>
+            <span class="kd">let</span> <span class="nx">promise</span> <span class="o">=</span> <span class="nx">controller</span><span class="p">(</span><span class="nx">app</span><span class="p">,</span> <span class="nx">model</span><span class="p">,</span> <span class="nx">event</span><span class="p">);</span>
+            <span class="nx">promise</span><span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">transformer</span><span class="p">)</span> <span class="p">{</span>
+                <span class="c1">// XXX: if the controller returns nothing</span>
+                <span class="c1">// this will lead to an &#39;undefined&#39; error</span>
+                <span class="c1">// which is not very friendly.</span>
+                <span class="kd">let</span> <span class="nx">newModel</span> <span class="o">=</span> <span class="nx">transformer</span><span class="p">();</span>
+                <span class="nx">model</span> <span class="o">=</span> <span class="nx">newModel</span><span class="p">;</span>  <span class="c1">// XXX: side effect</span>
+                <span class="nx">render</span><span class="p">();</span>
+            <span class="p">});</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+
+    <span class="cm">/* Render the application */</span>
+    <span class="nx">render</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">pk</span><span class="p">(</span><span class="s1">&#39;rendering&#39;</span><span class="p">);</span>
+        <span class="kd">let</span> <span class="nx">html</span> <span class="o">=</span> <span class="nx">view</span><span class="p">(</span><span class="nx">model</span><span class="p">,</span> <span class="nx">makeController</span><span class="p">);</span>
+        <span class="nx">ReactDOM</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="nx">html</span><span class="p">,</span> <span class="nx">root</span><span class="p">);</span>
+    <span class="p">};</span>
+
+    <span class="c1">// sneak into an application from the outside.</span>
+    <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">change</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">let</span> <span class="nx">promise</span> <span class="o">=</span> <span class="nx">change</span><span class="p">(</span><span class="nx">app</span><span class="p">,</span> <span class="nx">model</span><span class="p">);</span>
+        <span class="nx">promise</span><span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">transformer</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span><span class="p">(</span><span class="nx">transformer</span><span class="p">)</span> <span class="p">{</span>
+                <span class="kd">let</span> <span class="nx">newModel</span> <span class="o">=</span> <span class="nx">transformer</span><span class="p">();</span>
+                <span class="nx">model</span> <span class="o">=</span> <span class="nx">newModel</span><span class="p">;</span>  <span class="c1">// XXX: side effect</span>
+                <span class="nx">render</span><span class="p">();</span>
+            <span class="p">}</span>
+        <span class="p">});</span>
+    <span class="p">};</span>
+<span class="p">};</span>
+</pre></div>
+
+    </div>
+    <div>
+        
+    </div>
+
+    </body>
+</html>

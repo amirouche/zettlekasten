@@ -1,0 +1,1 @@
+{"timestamp": "2020-05-02T18:55:11", "body": "Long story made short.  I have fixed a bug in my so-called\n[state-of-art frontend pseudo framework while porting it to\nJavaScript](https://github.com/amirouche/ff.js). At the time of\nwriting, there is still bugs in it but it is useable without\nreactjs hooks.", "links": []}

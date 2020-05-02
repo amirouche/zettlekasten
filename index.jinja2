@@ -1,0 +1,8 @@
+{% extends "base.jinja2" %}
+
+{% block body %}
+    <h1><a href="https://hyper.dev">hyper.dev</a></h1>
+    {% for note in notes %}
+        <a href="{{ note }}.html">{{ note }}</a>
+    {% endfor %}
+{% endblock %}

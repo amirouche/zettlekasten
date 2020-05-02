@@ -1,0 +1,13 @@
+{% extends "base.jinja2" %}
+
+{% block body %}
+    <h1><a href="https://hyper.dev">hyper.dev</a></h1>
+    <div>
+        {{ markdown(note.body) }}
+    </div>
+    <div>
+        {% for link in note.links %}
+            <a href="{{ link }}.html">{{ link }}</a>
+        {% endfor %}
+    </div>
+{% endblock %}

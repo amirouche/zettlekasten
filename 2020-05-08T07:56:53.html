@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>hyper.dev</title>
+    </head>
+    <body>
+        
+    <h1><a href="https://hyper.dev">hyper.dev</a></h1>
+    <div>
+        <h2>Scheme v. Python</h2>
+<p>(I promised myself to stick to zettlekasten kind of note (small and
+atomic), but here is a topic I have been thinking about for a while
+and I think I have enough matter to make a full post.)</p>
+<p>I have been practicing Scheme for 5 years and Python for more than 10
+years.  I know other programming languages but Python and Scheme are
+the two I am the most familiar with and the more invested in.</p>
+<p>In this note, I will try to compare Scheme versus Python from high
+level point of view of their respective ecosystems to a low level
+point of view of nitty gritty good old lines of code.</p>
+<h3>History</h3>
+<p>Scheme grew in academical circles and until recently it was the
+primary teaching material for computer science programming. The touted
+book is known as
+<a href="https://mitpress.mit.edu/sites/default/files/sicp/index.html">SICP</a>.
+I have that book, I read it from time to time, but never completed any
+exercices.  There is somewhat a cult around that book until the point
+where it became a
+<a href="https://knowyourmeme.com/forums/meme-research/topics/47038-structure-and-interpretation-of-computer-programs-hugeass-image-dump-for-evidence">meme</a>. And
+the book was adapted to JavaScript.</p>
+<p>MIT university switched from Scheme to Python around 2009. The
+rationale can be <em>grossly</em> summarized as nowadays coders do not need
+to know all the stuff SICP teach, or try to teach.</p>
+<p>This happened a little before or at the same time Machine Learning
+frenzy happened, at which point data science was a thing.</p>
+<p>Even if Scheme was teached decades in various universities, it has
+little or not industrial footprint.  That is, there is not a lot of
+users of Scheme.</p>
+<p>This partly due to AI winter around 1980, that match with LISP winter
+where LISP programming language like Scheme, even if very powerful and
+high level, were slow.</p>
+<h3>Standards and Implementations</h3>
+<p>There is at least seven iterations over the definitions of Scheme
+programming language. The latest is <a href="https://small.r7rs.org/">R7RS</a>.
+There is (too many) implementations, among the most notable there is
+Racket.  There is no reference implementation, but chibi scheme has
+lot of traction toward that. Until recently the standard was put
+together by a group of experts with a unanimity vote. Nowadays the
+process is open to anyone.</p>
+<p>Python is at verion 3.8. It used to be supervised by a BDFL, but
+nowadays it is created by a group of core developers.  The reference
+implementation is CPython, a bytecode interpreter, the other popular
+implementations includes PyPy a Just-In-Time Compiler Virtual Machine.
+There is also micropython that targets small hardware.</p>
+<p>The main differences between both programming languages are as follow:</p>
+<ul>
+<li>A democractic standard versus core developer group</li>
+<li>A lot of implementations versus a few implementations</li>
+</ul>
+<p>On microbenchmarks, Racket is faster than PyPy and CPython. And Racket
+is not the fastest Scheme.</p>
+<p>One might say, speed does not matter (except when it does).</p>
+<p>Scheme open-source offering is fragmented, there is many
+implementations, each of which used to have different module system,
+which leads to maybe a lot of Scheme libraries, but since libraries
+were incompatible between Scheme implementation, you would end missing
+a few <em>things</em>.</p>
+<p>Python open-source offering is more comparable to JavaScript.  That is
+there is a lot of libraries available in the wild, and since most users
+use CPython, there is no problem of compatibility.</p>
+<h3>Language features</h3>
+<p>Both Python and Scheme are LISP 1, that is they use the same
+environment (or namespace) for variables and functions (that are called
+procedures in Scheme).  I never practiced LISP 2 like Common Lisp or
+elisp, so I can not really tell whether one is better than the other.</p>
+<p>Scheme is lexically scoped, whereas Python is function-scoped. You do
+not see the difference until you use Python's <code>nonlocal</code> or <code>global</code>.
+The difference is minimal, the only thing that is surprising about
+Python's <code>nonlocal</code> is the fact that it is an exception rule. That is,
+the behavior is to bind a new variable possibly shadowing the
+previously defined variable with the same name, exept when you do not
+want to shadow.  Usually, in programming it is easier to think in
+terms of "what you want" instead of "what you do not want" because the
+general semantic of the negation is unbound (unlike boolean <code>not</code>).</p>
+<p>Python has loads of features, and most structural change to the
+language require a change in the implementation. Nowadays, the most
+visible instance of that problem is the <code>async</code> and <code>await</code> keywords.</p>
+<p>In general, the approach taken by Scheme is to have powerful enough
+primitives to make it possible to adapt to most, if not any,
+situations.  To compare to Python <code>async</code> and <code>await</code>, the approach
+taken with Scheme to solve the same problem to have sequential
+asynchronous code, does not require a change in the compiler or
+virtual machine implementation.  Instead, Scheme implementation
+provide a procedure that allows to customize the control flow. They
+optimized for the general (or generic) case.  I took as example
+sequential asynchronous code, but that is the same for class and
+meta-class based code. All those, with Scheme can be defined as
+libraries.</p>
+
+    </div>
+    <div>
+        
+    </div>
+
+    </body>
+</html>
